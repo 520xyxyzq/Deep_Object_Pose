@@ -4,4 +4,11 @@
   <node name="dope" pkg="dope" type="dope" output="screen" clear_params="true">
     <rosparam file="$(arg config)"/>
   </node>
+  
+  <node name="video_recorder_node" pkg="image_view" type="video_recorder" respawn="false" output="screen" >
+    <remap from="image" to="dope/rgb_points"/>
+    <param name = "filename" value = "/home/ziqi/Videos/dope_output.avi"/>
+    <param name = "encoding" value = "bgr8" />
+  </node>
+
 </launch>
