@@ -42,8 +42,8 @@ The following steps describe the native installation. Alternatively, use the pro
 
 4. **Install python dependencies**
     ```
-    $ cd ~/catkin_ws/src/dope
-    $ pip install -r requirements.txt
+    $ python -m pip install --user torch==1.4.0+cu100 torchvision==0.5.0+cu100 -f https://download.pytorch.org/whl/torch_stable.html
+    $ python -m pip install --user pyrr numpy scipy opencv_python Pillow 
     ```
 
 5. **Install ROS dependencies**
