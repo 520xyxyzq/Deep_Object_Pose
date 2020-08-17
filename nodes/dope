@@ -300,12 +300,9 @@ class DopeNode(object):
                     draw.draw_cube(points2d, self.draw_colors[m])
 
         # Publish the image with results overlaid
-        self.pub_rgb_dope_points.publish(
-            CvBridge().cv2_to_imgmsg(
-                np.array(im)[..., ::-1],
-                "bgr8"
-            )
-        )
+        img_msg_out = CvBridge().cv2_to_imgmsg(np.array(im)[..., ::-1], "bgr8")
+        img_msg_out.header.stamp = rospy.Time.now()
+        self.pub_rgb_dope_points.publish(img_msg_out)
         self.pub_detections.publish(detection_array)
         self.publish_markers(detection_array)
 
