@@ -49,8 +49,8 @@ The following steps describe the native installation. Alternatively, use the pro
 5. **Install ROS dependencies**
     ```
     $ cd ~/catkin_ws
-    $ rosdep install --from-paths src -i --rosdistro kinetic
-    $ sudo apt-get install ros-kinetic-rosbash ros-kinetic-ros-comm
+    $ rosdep install --from-paths src -i --rosdistro melodic
+    $ sudo apt-get install ros-melodic-rosbash ros-melodic-ros-comm
     ```
 
 6. **Build**
