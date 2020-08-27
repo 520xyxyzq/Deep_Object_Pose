@@ -51,6 +51,7 @@ The following steps describe the native installation. Alternatively, use the pro
     $ cd ~/catkin_ws
     $ rosdep install --from-paths src -i --rosdistro melodic
     $ sudo apt-get install ros-melodic-rosbash ros-melodic-ros-comm
+    $ sudo apt-get install ros-melodic-vision-msgs ros-melodic-camera-info-manager-py
     ```
 
 6. **Build**
