@@ -15,10 +15,11 @@ __copyright__ = "Copyright 2021 The Ambitious Folks of the MRG"
 import rospy
 import cv2
 import numpy as np
-import tf
+import os
 
 from apriltag_ros.msg import AprilTagDetectionArray # for card/tag poses
 from vision_msgs.msg import Detection3DArray # for dope poses
+from sensor_msgs.msg import Image
 
 from scipy.spatial.transform import Rotation as Rot
 
@@ -61,13 +62,13 @@ class CardsEvaluate(object):
             rospy.logwarn("No card detection!")
         else:
             rospy.loginfo("Number of detections: %d", self.dets)
-            rospy.loginfo("True positive rate: %.2f", 
+            rospy.loginfo("True positive rate: %.3f", 
                 self.inlier/np.double(self.dets))
-            rospy.loginfo("False positive rate: %.2f",
+            rospy.loginfo("False positive rate: %.3f",
                 self.outlier/np.double(self.dets))
-            rospy.loginfo("Average translation distance: %.2f", 
+            rospy.loginfo("Average translation distance: %.3f", 
                 sum(self.dist_trans)/(1e-20+len(self.dist_trans)))
-            rospy.loginfo("Average rotation distance: %.2f", 
+            rospy.loginfo("Average rotation distance: %.3f", 
                 sum(self.dist_rot)/(1e-20+len(self.dist_rot)))            
         self.ctrl_c = True
 
@@ -125,6 +126,8 @@ class CardsEvaluate(object):
         # It's possible but rare to have 2 detections in the same frame
         # TODO(ziqi): deal with this situation
         if len(dets) > 1: rospy.logwarn("More than 1 card detected")
+        elif len(dets) == 0:
+            rospy.logdebug("No card detected")
         else:
             card_quat = np.array([dets[0].pose.pose.pose.orientation.x,
                                    dets[0].pose.pose.pose.orientation.y,
@@ -140,7 +143,9 @@ class CardsEvaluate(object):
             # Compute the distance to ground truth
             dist_trans = np.linalg.norm(card_trans - tag_trans)
             dist_rot = self.computeRotDist(card_quat, tag_quat) 
-            # Treat as outlier as relative translation > square size
+            # Treat detection as outlier if relative translation > threshold
+            # NOTE: we may need to tune the threshold 
+            # or make more advanced criteria to correctly separate outliers
             if dist_trans > self.square_size:
                 self.outlier += 1
             else:
@@ -154,7 +159,13 @@ class CardsEvaluate(object):
         Input: 
             msg(... msg)
         '''
-        # TODO: implement this
+        # TODO: implement 
+        # Most of this function should be exactly the same as card_test_cb
+        # NOTE: I'm not 100% sure if the card's relative yaw angle is within [-90, 90]
+        #       It might be [-180, 0], [0, 180], etc.
+        #       So we should check that and might need to map the rotation back to [-90, 90]
+        
+
 
     def computeRotDist(self, quat1, quat2):
         '''
@@ -165,7 +176,7 @@ class CardsEvaluate(object):
         Output:
             dist(double)
         '''
-        assert len(quat1) == 4&len(quat2) == 4
+        assert len(quat1) == 4 & len(quat2) == 4
         rotmat1 = Rot.from_quat(quat1).as_dcm()
         rotmat2 = Rot.from_quat(quat2).as_dcm()
         return np.linalg.norm(rotmat1-rotmat2)
